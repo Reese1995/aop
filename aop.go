@@ -102,13 +102,8 @@ func (p *AOP) funcWrapper(bean *Bean, methodName string, methodType reflect.Type
 
 		funcInSturctName := getFuncNameByStructFuncName(methodName)
 
-		realFunc := func(args ...interface{}) Result {
-			values := []reflect.Value{}
-			for _, arg := range args {
-				values = append(values, reflect.ValueOf(arg))
-			}
-
-			return beanValue.MethodByName(funcInSturctName).Call(values)
+		realFunc := func(args []reflect.Value) Result {
+			return beanValue.MethodByName(funcInSturctName).Call(args)
 		}
 
 		//@Around
