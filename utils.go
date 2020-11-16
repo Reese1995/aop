@@ -77,22 +77,16 @@ func invokeAdvices(joinPoint JoinPointer, advices []*Advice, methodName string, 
 			appendTraceItem(joinPoint.CallID(), metadata.File, metadata.Line, advice.Method, methodName, advice.beanRef.ID())
 		}
 
-		var adviceMethodMeta MethodMetadata
-		if adviceMethodMeta, err = advice.beanRef.methodMetadata(advice.Method); err != nil {
-			return
+		inputs := make([]reflect.Value, 0)
+		for _, arg := range joinPoint.Args() {
+			inputs = append(inputs, reflect.ValueOf(arg))
 		}
-
-		var invokeArgs Args
-		if adviceMethodMeta.IsEqual(joinPointFuncType) ||
-			adviceMethodMeta.IsEqual(proceedingJoinPointType) {
-			invokeArgs = Args{joinPoint}
-		} else if adviceMethodMeta.IsEqual(joinPointWithResultFuncType) {
-			invokeArgs = Args{joinPoint, result}
-		} else {
-			invokeArgs = joinPoint.Args()
+		for _, r := range result {
+			inputs = append(inputs, reflect.ValueOf(r))
 		}
+		
 
-		if _, err = advice.beanRef.Invoke(advice.Method, invokeArgs, func(values ...interface{}) {
+		if _, err = advice.beanRef.Invoke(advice.Method, inputs, func(values ...interface{}) {
 			if values != nil {
 				for _, v := range values {
 					if errV, ok := v.(error); ok {
