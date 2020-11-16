@@ -66,16 +66,10 @@ func (p *Bean) methodMetadata(methodName string) (metadata MethodMetadata, err e
 	return
 }
 
-func (p *Bean) Invoke(methodName string, args Args, callback ...interface{}) (returnFunc func(), err error) {
+func (p *Bean) Invoke(methodName string, inputs []reflect.Value, callback ...interface{}) (returnFunc func(), err error) {
 	var beanValue reflect.Value
 
 	beanValue = reflect.ValueOf(p.instance)
-
-	inputs := make([]reflect.Value, len(args))
-
-	for i := range args {
-		inputs[i] = reflect.ValueOf(args[i])
-	}
 
 	values := beanValue.MethodByName(methodName).Call(inputs)
 
